@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(
+          ~{::title},
+          ~{::main}
+      )}">
+
+<head>
+    <title>Календарь</title>
+</head>
+
+<main>
+
+    <h2 th:text="${calendar.name}">Календарь</h2>
+
+    <!-- ===== Сообщения ===== -->
+    <div th:if="${param.updated}" class="message success">
+        Календарь обновлён
+    </div>
+
+    <div th:if="${param.eventCreated}" class="message success">
+        Событие создано
+    </div>
+
+    <!-- ===== Настройки календаря ===== -->
+    <section>
+        <h3>Настройки календаря</h3>
+
+        <form th:action="@{{id}/update(id=${calendar.id})}"
+              th:object="${calendar}"
+              method="post">
+
+        <label>
+                Название
+                <input type="text"
+                       th:field="*{name}"
+                       maxlength="100"
+                       required>
+            </label>
+
+            <label>
+                Описание
+                <textarea th:field="*{description}"
+                          maxlength="500"></textarea>
+            </label>
+
+            <input type="hidden" th:field="*{id}">
+            <input type="hidden" th:field="*{ownerId}">
+
+            <button type="submit">Сохранить</button>
+        </form>
+    </section>
+
+    <!-- ===== Удаление календаря ===== -->
+    <section>
+        <h3 style="color: #e74c3c;">Удаление календаря</h3>
+
+        <form th:action="@{/calendar/{id}/delete(id=${calendar.id})}"
+              method="post"
+              class="danger"
+              onsubmit="return confirm('Удалить календарь и все события?');">
+
+            <button type="submit">Удалить календарь</button>
+        </form>
+    </section>
+
+    <!-- ===== События ===== -->
+    <section>
+        <h3>События</h3>
+
+        <div th:if="${#lists.isEmpty(events)}">
+            Событий пока нет
+        </div>
+
+        <div th:each="event : ${events}"
+             style="border: 1px solid #ddd; border-radius: 6px; padding: 12px; margin-bottom: 10px;">
+
+            <strong th:text="${event.title}">Название</strong>
+
+            <div th:text="${event.description}">Описание</div>
+
+            <small>
+                <span th:text="${event.startTime}"></span>
+                —
+                <span th:text="${event.endTime}"></span>
+            </small>
+
+            <div style="margin-top: 10px;">
+                <!-- отметить выполненным -->
+                <form th:if="${!event.done}"
+                      th:action="@{/calendar/{cid}/events/{eid}/done(cid=${calendar.id}, eid=${event.id})}"
+                      method="post"
+                      style="display:inline;">
+                    <button type="submit">Выполнено</button>
+                </form>
+
+                <!-- отменить выполнение -->
+                <form th:if="${event.done}"
+                      th:action="@{/calendar/{cid}/events/{eid}/undone(cid=${calendar.id}, eid=${event.id})}"
+                      method="post"
+                      style="display:inline;">
+                    <button type="submit">Не выполнено</button>
+                </form>
+
+                <!-- удалить -->
+                <form th:action="@{/calendar/{cid}/events/{eid}/delete(cid=${calendar.id}, eid=${event.id})}"
+                      method="post"
+                      style="display:inline;"
+                      onsubmit="return confirm('Удалить событие?');">
+                    <button type="submit">Удалить</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== Новое событие ===== -->
+    <section>
+        <h3>Новое событие</h3>
+
+        <form th:action="@{/calendar/{id}/events(id=${calendar.id})}"
+              th:object="${event}"
+              method="post">
+
+            <!-- ===== Основные данные ===== -->
+
+            <div th:if="${#fields.hasErrors('*')}" class="message error">
+                <p>Форма содержит ошибки</p>
+            </div>
+
+            <label>
+                Название
+                <input type="text"
+                       th:field="*{title}"
+                       required>
+            </label>
+
+            <label>
+                Описание
+                <textarea th:field="*{description}"></textarea>
+            </label>
+
+            <label>
+                Начало
+                <input type="datetime-local"
+                       th:field="*{startTime}"
+                       required>
+            </label>
+
+            <label>
+                Окончание
+                <input type="datetime-local"
+                       th:field="*{endTime}"
+                       required>
+            </label>
+
+            <label>
+                Приоритет
+                <select th:field="*{priority}">
+                    <option value="LOW">Низкий</option>
+                    <option value="MEDIUM">Средний</option>
+                    <option value="HIGH">Высокий</option>
+                </select>
+            </label>
+
+            <!-- ===== Повторение ===== -->
+            <fieldset>
+                <legend>Повторение</legend>
+
+                <label>
+                    Тип
+                    <select th:field="*{recurrence.type}">
+                        <option value="NONE">Без повторения</option>
+                        <option value="DAILY">Каждый день</option>
+                        <option value="WEEKLY">Каждую неделю</option>
+                        <option value="MONTHLY">Каждый месяц</option>
+                        <option value="YEARLY">Каждый год</option>
+                    </select>
+                </label>
+
+                <label>
+                    Повторять с
+                    <input type="date" th:field="*{recurrence.fromDate}">
+                </label>
+
+                <label>
+                    Повторять до
+                    <input type="date" th:field="*{recurrence.untilDate}">
+                </label>
+            </fieldset>
+
+            <!-- ===== Напоминание ===== -->
+            <fieldset style="margin-top: 15px;">
+                <legend>Напоминание</legend>
+
+                <label>
+                    Когда напомнить
+                    <input type="datetime-local"
+                           th:field="*{reminder.remindAt}">
+                </label>
+
+                <label>
+                    Канал
+                    <select th:field="*{reminder.channel}">
+                        <option value="">—</option>
+                        <option value="PUSH">Уведомления</option>
+                    </select>
+                </label>
+            </fieldset>
+
+            <input type="hidden" th:field="*{calendarId}">
+
+            <button type="submit">Создать событие</button>
+        </form>
+    </section>
+
+</main>
+</html>

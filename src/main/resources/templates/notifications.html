@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::title}, ~{::main})}">
+
+<head>
+    <title>Уведомления</title>
+</head>
+
+<main>
+    <h2>Уведомления</h2>
+
+    <div th:if="${#lists.isEmpty(reminders)}">
+        У вас нет новых уведомлений
+    </div>
+
+    <div th:each="reminder : ${reminders}"
+         style="border:1px solid #ddd; padding:12px; border-radius:6px; margin-bottom:10px;">
+
+        <strong th:text="${reminder.eventTitle}">Название события</strong>
+
+        <div>
+            Напоминание пришло в
+            <span th:text="${reminder.remindAt}"></span>
+        </div>
+
+        <form th:action="@{/notifications/{id}/read(id=${reminder.id})}"
+              method="post">
+            <button type="submit">Ок</button>
+        </form>
+    </div>
+</main>
+</html>

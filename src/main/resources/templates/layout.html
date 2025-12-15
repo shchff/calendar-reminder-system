@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org"
+      th:fragment="layout(title, content)">
+
+<head>
+    <meta charset="UTF-8">
+    <title th:replace="${title}">Calendar Reminder System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header nav a {
+            color: white;
+            margin-right: 15px;
+            text-decoration: none;
+        }
+
+        header form {
+            display: inline;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 30px auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 8px;
+        }
+
+        section {
+            margin-bottom: 30px;
+        }
+
+        form {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 6px;
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+
+        .message {
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .success {
+            background-color: #e6ffed;
+            border: 1px solid #2ecc71;
+        }
+
+        .danger {
+            border-color: #e74c3c;
+        }
+
+        .danger button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            color: #777;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header th:if="${#authorization.expression('isAuthenticated()')}">
+    <nav>
+        <a th:href="@{/calendars}">Календари</a>
+        <a th:href="@{/profile}">Профиль</a>
+        <a th:href="@{/notifications}">
+            Уведомления
+            <span th:if="${notificationCount > 0}"
+                  style="
+                    background:#e74c3c;
+                    color:white;
+                    padding:2px 6px;
+                    border-radius:10px;
+                    font-size:12px;
+                    margin-left:4px;">
+                <span th:text="${notificationCount}">0</span>
+            </span>
+        </a>
+    </nav>
+
+    <form th:action="@{/logout}" method="post">
+        <button type="submit">Выйти</button>
+    </form>
+</header>
+
+<main th:replace="${content}">
+    <!-- сюда подставляется контент страницы -->
+</main>
+
+<footer>
+    Calendar Reminder System MVP © 2025
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::title}, ~{::main})}">
+
+<head>
+    <title>Календари</title>
+</head>
+
+<main>
+
+    <h2>Мои календари</h2>
+
+    <!-- ===== Сообщения ===== -->
+    <div th:if="${param.created}" class="message success">
+        Календарь успешно создан
+    </div>
+
+    <div th:if="${param.deleted}" class="message success">
+        Календарь удалён
+    </div>
+
+    <!-- ===== Создание календаря ===== -->
+    <section>
+        <h3>Создать новый календарь</h3>
+
+        <form th:action="@{/calendars}" th:object="${calendar}" method="post">
+
+            <label>
+                Название
+                <input type="text" th:field="*{name}" maxlength="100" required>
+            </label>
+
+            <label>
+                Описание
+                <textarea th:field="*{description}" maxlength="500"></textarea>
+            </label>
+
+            <!-- ownerId подставляется контроллером -->
+            <input type="hidden" th:field="*{ownerId}">
+
+            <button type="submit">Создать календарь</button>
+        </form>
+    </section>
+
+    <!-- ===== Список календарей ===== -->
+    <section>
+        <h3>Список календарей</h3>
+
+        <div th:if="${#lists.isEmpty(calendars)}">
+            У вас пока нет календарей
+        </div>
+
+        <div class="calendar-grid" th:if="${!#lists.isEmpty(calendars)}">
+
+            <div class="calendar-card" th:each="cal : ${calendars}">
+
+                <div>
+                    <h4 th:text="${cal.name}">Название</h4>
+                    <p th:text="${cal.description}">Описание</p>
+                </div>
+
+                <div class="calendar-actions">
+                    <a th:href="@{/calendar/{id}(id=${cal.id})}">
+                        <button type="button">Открыть</button>
+                    </a>
+
+                    <form th:action="@{/calendar/{id}/delete(id=${cal.id})}"
+                          method="post"
+                          onsubmit="return confirm('Удалить календарь?');">
+                        <button type="submit" class="danger">Удалить</button>
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+</main>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::title}, ~{::main})}">
+
+<head>
+    <title>Профиль пользователя</title>
+</head>
+
+<main>
+
+    <h2>Профиль пользователя</h2>
+
+    <!-- ===== Сообщения ===== -->
+    <div th:if="${param.updated}" class="message success">
+        Профиль успешно обновлён
+    </div>
+
+    <div th:if="${param.emailChanged}" class="message success">
+        Email изменён. Пожалуйста, войдите заново.
+    </div>
+
+    <div th:if="${param.passwordChanged}" class="message success">
+        Пароль изменён. Пожалуйста, войдите заново.
+    </div>
+
+    <div th:if="${param.accountDeleted}" class="message success">
+        Аккаунт удалён
+    </div>
+
+    <!-- ===== Личные данные ===== -->
+    <section>
+        <h3>Личные данные</h3>
+
+        <form th:action="@{/profile}" th:object="${user}" method="post">
+
+            <label>
+                Имя
+                <input type="text" th:field="*{name}" maxlength="50" required>
+            </label>
+
+            <label>
+                Фамилия
+                <input type="text" th:field="*{surname}" maxlength="50" required>
+            </label>
+
+            <label>
+                Email
+                <input type="email" th:field="*{email}" maxlength="100" required>
+            </label>
+
+            <!-- скрытые поля для корректного биндинга UserDto -->
+            <input type="hidden" th:field="*{id}">
+            <input type="hidden" th:field="*{role}">
+
+            <button type="submit">Сохранить изменения</button>
+        </form>
+    </section>
+
+    <!-- ===== Смена пароля ===== -->
+    <section>
+        <h3>Смена пароля</h3>
+
+        <form th:action="@{/profile/password}" method="post">
+
+            <label>
+                Текущий пароль
+                <input type="password" name="oldPassword" required>
+            </label>
+
+            <label>
+                Новый пароль
+                <input type="password" name="newPassword" minlength="6" required>
+            </label>
+
+            <button type="submit">Сменить пароль</button>
+        </form>
+    </section>
+
+    <!-- ===== Удаление аккаунта ===== -->
+    <section>
+        <h3 style="color: #e74c3c;">Удаление аккаунта</h3>
+
+        <form th:action="@{/profile/delete}"
+              method="post"
+              class="danger"
+              onsubmit="return confirm('Вы уверены, что хотите удалить аккаунт? Это действие необратимо');">
+
+            <label>
+                Пароль для подтверждения
+                <input type="password" name="password" required>
+            </label>
+
+            <button type="submit">Удалить аккаунт</button>
+        </form>
+    </section>
+
+</main>
+</html>

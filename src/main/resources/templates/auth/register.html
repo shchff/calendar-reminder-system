@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::title}, ~{::main})}">
+
+<head>
+    <title>Регистрация</title>
+</head>
+
+<main>
+
+    <h2>Регистрация</h2>
+
+    <div class="message danger" th:if="${registrationError}">
+        <p th:text="${registrationError}"></p>
+    </div>
+
+    <form th:action="@{/auth/register}"
+          method="post"
+          th:object="${dto}">
+
+        <div th:if="${#fields.hasGlobalErrors()}">
+            <p th:each="err : ${#fields.globalErrors()}"
+               th:text="${err}"
+               style="color:red">
+            </p>
+        </div>
+
+        <label>Email</label>
+        <input type="email" th:field="*{email}">
+        <div th:errors="*{email}" style="color:red"></div>
+
+        <label>Пароль</label>
+        <input type="password" th:field="*{password}">
+        <div th:errors="*{password}" style="color:red"></div>
+
+        <label>Имя</label>
+        <input type="text" th:field="*{name}">
+        <div th:errors="*{name}" style="color:red"></div>
+
+        <label>Фамилия</label>
+        <input type="text" th:field="*{surname}">
+        <div th:errors="*{surname}" style="color:red"></div>
+
+        <label>Роль</label>
+        <select th:field="*{role}">
+            <option value="USER">Пользователь</option>
+            <option value="ADMIN">Администратор</option>
+        </select>
+        <div th:errors="*{role}" style="color:red"></div>
+
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+
+    <p>
+        <a th:href="@{/auth/login}">
+            Уже есть аккаунт? Войти
+        </a>
+    </p>
+
+</main>
+</html>
